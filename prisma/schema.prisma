@@ -1,0 +1,140 @@
+// Face Recognition-Based E-Voting System — database schema
+// Key design rule: WHO voted (Participation) is stored separately from
+// WHAT was voted (Ballot), so no row links a voter to a candidate.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ElectionStatus {
+  DRAFT
+  OPEN
+  CLOSED
+}
+
+enum Sex {
+  MALE
+  FEMALE
+}
+
+enum EmailStatus {
+  SENT
+  FAILED
+  SKIPPED
+}
+
+/// A registered voter. Identity details follow the Rwandan National ID card;
+/// no photo is ever stored — only a 128-number face descriptor.
+model Voter {
+  id             String                @id @default(cuid())
+  voterNumber    String                @unique // generated, e.g. "FV-482913"
+  nationalId     String                @unique // 16-digit Rwandan National ID (digits only)
+  firstName      String
+  lastName       String
+  dateOfBirth    DateTime              @db.Date
+  sex            Sex
+  phone          String // normalised E.164, e.g. +250781234567
+  email          String? // for registration + vote confirmation emails
+  province       String
+  district       String
+  sector         String
+  cell           String
+  village        String
+  pinHash        String // bcrypt hash of the voter's 6-digit PIN
+  faceDescriptor Float[] // 128-number face embedding (average of enrolment samples)
+  isEligible     Boolean               @default(true)
+  consentAt      DateTime // when the voter consented to biometric processing
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  participations Participation[]
+  attempts       VerificationAttempt[]
+
+  @@index([lastName, firstName])
+}
+
+model Election {
+  id             String          @id @default(cuid())
+  title          String
+  description    String?
+  status         ElectionStatus  @default(DRAFT)
+  createdAt      DateTime        @default(now())
+  candidates     Candidate[]
+  ballots        Ballot[]
+  participations Participation[]
+}
+
+model Candidate {
+  id         String   @id @default(cuid())
+  electionId String
+  name       String
+  party      String?
+  bio        String?
+  photoUrl   String?
+  election   Election @relation(fields: [electionId], references: [id], onDelete: Cascade)
+  ballots    Ballot[]
+
+  @@index([electionId])
+}
+
+/// Records THAT a voter took part in an election. The unique constraint is
+/// the database-level guarantee of "one person, one vote". The receipt code
+/// proves participation to the voter — it says nothing about the choice.
+model Participation {
+  id          String   @id @default(cuid())
+  voterId     String
+  electionId  String
+  receiptCode String   @unique
+  votedAt     DateTime @default(now())
+  voter       Voter    @relation(fields: [voterId], references: [id], onDelete: Cascade)
+  election    Election @relation(fields: [electionId], references: [id], onDelete: Cascade)
+
+  @@unique([voterId, electionId])
+}
+
+/// Records WHAT was voted. Deliberately has no voterId and no timestamp,
+/// so ballots cannot be matched back to Participation rows by time.
+model Ballot {
+  id          String    @id @default(cuid())
+  electionId  String
+  candidateId String
+  election    Election  @relation(fields: [electionId], references: [id], onDelete: Cascade)
+  candidate   Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+
+  @@index([electionId])
+}
+
+/// Every identity check (credentials step and face step). Used for lockouts,
+/// the admin verification log and FAR/FRR analysis.
+model VerificationAttempt {
+  id         String   @id @default(cuid())
+  voterId    String?
+  identifier String // National ID as entered (digits only)
+  stage      String // "credentials" | "face"
+  success    Boolean
+  reason     String?
+  distance   Float?
+  ipHash     String? // salted hash of the client IP (for abuse limits, not tracking)
+  createdAt  DateTime @default(now())
+  voter      Voter?   @relation(fields: [voterId], references: [id], onDelete: SetNull)
+
+  @@index([identifier, createdAt])
+  @@index([ipHash, createdAt])
+}
+
+/// Outbox log of transactional emails (Brevo). Addresses are stored masked.
+model EmailLog {
+  id         String      @id @default(cuid())
+  type       String // "registration" | "vote_confirmation" | "test"
+  toMasked   String
+  status     EmailStatus
+  providerId String?
+  error      String?
+  createdAt  DateTime    @default(now())
+
+  @@index([createdAt])
+}
