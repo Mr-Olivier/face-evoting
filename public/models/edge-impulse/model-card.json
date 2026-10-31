@@ -1,0 +1,35 @@
+{
+  "isSample": false,
+  "note": "Model v1: proof-of-concept trained on 20 images (12 faces from 4 people + 8 backgrounds). It does not detect faces yet (F1 0.00); the app's safety net finds faces until the model is retrained with ~200 images.",
+  "name": "FaceVote Face Detector",
+  "version": "v1",
+  "edgeImpulseProject": "FaceVote Detector (1153061)",
+  "task": "Object detection (FOMO)",
+  "architecture": "FOMO (Faster Objects, More Objects) MobileNetV2 0.1",
+  "labels": ["face"],
+  "input": { "width": 96, "height": 96, "colorDepth": "Grayscale", "resizeMode": "Squash" },
+  "training": { "cycles": 60, "learningRate": 0.001, "validationSplit": 0.2, "dataAugmentation": true },
+  "dataset": {
+    "volunteers": 4,
+    "totalImages": 20,
+    "faceImages": 12,
+    "backgroundImages": 8,
+    "trainImages": 16,
+    "testImages": 4,
+    "boundingBoxes": 12
+  },
+  "metrics": {
+    "f1": 0.0,
+    "precision": 0.0,
+    "recall": 0.0,
+    "testAccuracy": 0.0
+  },
+  "confusionMatrix": {
+    "labels": ["background", "face"],
+    "rows": [
+      [100, 0],
+      [100, 0]
+    ]
+  },
+  "onDevice": { "target": "Browser (WebAssembly, int8)", "inferenceMs": 0, "ramKb": 0, "flashKb": 0 }
+}
