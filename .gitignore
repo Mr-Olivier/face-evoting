@@ -1,0 +1,14 @@
+node_modules
+.next
+out
+.env
+.env.local
+*.tsbuildinfo
+next-env.d.ts
+.DS_Store
+public/models/face-api/
+# Exported Edge Impulse model files (re-export from Studio when needed)
+public/models/edge-impulse/*.js
+public/models/edge-impulse/*.wasm
+!public/models/edge-impulse/README.md
+/dataset/

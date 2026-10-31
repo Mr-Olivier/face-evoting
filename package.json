@@ -1,0 +1,54 @@
+{
+  "name": "face-evoting",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Face Recognition-Based E-Voting System (Edge Impulse + Next.js + PostgreSQL + Prisma)",
+  "scripts": {
+    "dev": "next dev",
+    "build": "prisma generate && next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "db:up": "docker compose up -d db",
+    "db:down": "docker compose down",
+    "db:migrate": "prisma migrate dev",
+    "db:reset": "prisma migrate reset",
+    "db:seed": "prisma db seed",
+    "db:studio": "prisma studio",
+    "models:download": "node scripts/download-face-models.mjs",
+    "postinstall": "prisma generate && node scripts/download-face-models.mjs",
+    "db:demo": "tsx prisma/seed-demo.ts",
+    "db:demo:clear": "tsx prisma/seed-demo.ts --clear",
+    "ei:check": "tsx --env-file=.env scripts/check-edge-impulse.ts",
+    "email:check": "tsx --env-file=.env scripts/check-email.ts",
+    "ei:diagnose": "tsx --env-file=.env scripts/diagnose-ingestion.ts"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.8.2",
+    "@vladmandic/face-api": "^1.7.15",
+    "bcryptjs": "^3.0.2",
+    "jose": "^6.0.11",
+    "lucide-react": "^1.65.0",
+    "next": "^15.3.3",
+    "nodemailer": "^7.0.13",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.8",
+    "@types/node": "^22.15.0",
+    "@types/nodemailer": "^8.0.2",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "prisma": "^6.8.2",
+    "tailwindcss": "^4.1.8",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
