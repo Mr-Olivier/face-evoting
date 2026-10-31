@@ -1,0 +1,135 @@
+@import "tailwindcss";
+
+/* Dark mode follows a `.dark` class on <html>, set by the theme script in layout.tsx. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---------- Design tokens (light) ---------- */
+:root {
+  color-scheme: light;
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --surface-2: #f1f3f6;
+  --border: #e2e5ea;
+  --border-strong: #cdd2da;
+  --text: #0f172a;
+  --muted: #5b6475;
+  --subtle: #8a93a3;
+  --primary: #2453d6;
+  --primary-hover: #1c44b8;
+  --primary-fg: #ffffff;
+  --primary-soft: #e8eefc;
+  --success: #15803d;
+  --success-soft: #e7f6ec;
+  --warning: #b45309;
+  --warning-soft: #fdf3e2;
+  --danger: #c2321f;
+  --danger-soft: #fdecea;
+  --ring: rgb(36 83 214 / 0.25);
+  /* chart series (validated categorical slots 1 and 2) */
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --shadow: 0 1px 2px rgb(15 23 42 / 0.04), 0 1px 3px rgb(15 23 42 / 0.06);
+}
+
+/* ---------- Design tokens (dark) ---------- */
+.dark {
+  color-scheme: dark;
+  --bg: #0b0f17;
+  --surface: #121826;
+  --surface-2: #1a2232;
+  --border: #252f42;
+  --border-strong: #34405a;
+  --text: #e7ebf2;
+  --muted: #9aa4b6;
+  --subtle: #6d7789;
+  --primary: #5b86f5;
+  --primary-hover: #7598f7;
+  --primary-fg: #0b0f17;
+  --primary-soft: #1a2647;
+  --success: #4ade80;
+  --success-soft: #11291b;
+  --warning: #fbbf24;
+  --warning-soft: #2c2210;
+  --danger: #f87171;
+  --danger-soft: #2f1517;
+  --ring: rgb(91 134 245 / 0.35);
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.3);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-subtle: var(--subtle);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-fg: var(--primary-fg);
+  --color-primary-soft: var(--primary-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-series-1: var(--series-1);
+  --color-series-2: var(--series-2);
+  --font-sans: "Segoe UI Variable Text", "Segoe UI", ui-sans-serif, system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
+}
+
+html {
+  background: var(--bg);
+}
+
+body {
+  @apply bg-bg font-sans text-text antialiased;
+}
+
+::selection {
+  background: var(--primary-soft);
+}
+
+/* ---------- Reusable component classes ---------- */
+@utility card {
+  @apply rounded-2xl border border-border bg-surface;
+  box-shadow: var(--shadow);
+}
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition outline-none focus-visible:ring-4 focus-visible:ring-(--ring) disabled:cursor-not-allowed disabled:opacity-50;
+}
+@utility btn-lg {
+  @apply px-6 py-3 text-base;
+}
+@utility btn-primary {
+  @apply btn bg-primary text-primary-fg hover:bg-primary-hover;
+}
+@utility btn-secondary {
+  @apply btn border border-border bg-surface text-text hover:bg-surface-2;
+}
+@utility btn-ghost {
+  @apply btn text-muted hover:bg-surface-2 hover:text-text;
+}
+@utility btn-danger {
+  @apply btn border border-border bg-surface text-danger hover:bg-danger-soft;
+}
+@utility input {
+  @apply w-full rounded-xl border border-border bg-surface px-3.5 py-2.5 text-sm text-text transition outline-none placeholder:text-subtle focus:border-primary focus:ring-4 focus:ring-(--ring);
+}
+@utility label {
+  @apply mb-1.5 block text-sm font-medium text-text;
+}
+
+/* Scanning line on the camera while the model is analysing */
+@keyframes scan {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+.animate-scan {
+  animation: scan 2.4s ease-in-out infinite alternate;
+}
